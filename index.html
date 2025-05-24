@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FruitCard Odyssey</title>
+    <link rel="stylesheet" href="Quiz.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W0BT0S586R"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-W0BT0S586R');
+    </script>
+</head>
+<body>
+    <div class="wrapper-main">
+        <div id="home" class="flex-center flex-column">
+        <header>
+            <img src="Banner.svg" style="max-width: 100%;">
+        </header>
+        <h3>
+            Discover your true flavor!
+        </h3>
+        <h4>
+            A fruit personality quiz inspired by cosmos persona, what cake R U?, and the MBTI personality types.
+        </h4>
+        <p>
+            <img src="Thumbnail.gif" style="max-width: 100%;">
+        </p>
+        <div class="begin-quiz-container">
+            <button id="begin-quiz">Begin Quiz</button>
+        </div>
+    </div>
+    <!--Quiz-Page-->
+    <div class="quiz-page" id="quiz-page" style= "display: none;">
+        <div id="quiz" class="justify-center flex-column">
+            <img id="question-progress-image" src="" >
+            <img id="question-image" src="">
+            <h2 id="question">question</h2>
+            <div id="choices" class="choices">
+                
+            </div>
+        </div>
+
+    <div>
+        <!--Results Page-->
+        <div id="results" style="display: none;">
+            <h1>You are ...</h1>
+            <div id="mbti-image">
+                
+            </div>  
+            <div>
+                <p2>Hold to save image!</p2>
+            </div>  
+            <div class="button-container">
+                <button class="share-button">Share Quiz!</button>
+                <button id="back-to-home">Back to Home</button>
+            </div>
+            <footer>
+                Made for <a href="https://www.codedex.io/">Codédex</a> monthly challenge | <a href="https://github.com/Gudetea">Github.Gudetea</a> |<a href="https://www.instagram.com/_noktea/">@_noktea</a>
+            </footer>
+        </div>
+    </div>
+    </div>
+    <script src="FruitQuiz.js"></script>
+</body>
+</html>
