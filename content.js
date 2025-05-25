@@ -187,7 +187,25 @@ function displayQuiz() {
         if (currentQuestionIndex < questions.length) {
             displayCurrentQuestion();
         } else {
-            displayResults();
+            displayTransitionPage();
+        }
+    }
+
+    // Function to display the transition page
+    function displayTransitionPage() {
+        const quizPage = document.getElementById('quiz-page');
+        const transitionPage = document.getElementById('transition-page');
+        const transitionText = document.getElementById('transition-text');
+        const continueButton = document.getElementById('continue-button');
+
+        if (quizPage && transitionPage && transitionText && continueButton) {
+            quizPage.style.display = 'none';
+            transitionPage.style.display = 'block';
+            transitionText.textContent = "Phù thủy vô tình hắt xì và trượt tay, đũa phép bắn ngược lại và biến phù thủy thành con cá mặt ngu. Cả đội trở về cung điện và diện kiến Queen, bạn được ban cho hình hài mới thông qua những gì bạn đã trải qua ở thế giới này.Bạn trở thành:";
+            continueButton.addEventListener('click', () => {
+                transitionPage.style.display = 'none';
+                displayResults();
+            });
         }
     }
 
@@ -209,10 +227,8 @@ function displayQuiz() {
         const topPersonalities = scores.filter(s => s.score === maxScore).map(s => s.name);
 
         // Display results
-        const quizPage = document.getElementById('quiz-page');
         const results = document.getElementById('results');
-        if (quizPage && results) {
-            quizPage.style.display = 'none';
+        if (results) {
             results.style.display = 'block';
             const resultElement = document.getElementById('result-text');
             if (resultElement) {
