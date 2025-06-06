@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống Kê Tài Chính Khởi Nghiệp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .period-selector {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .period-selector select {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid #3498db;
+            border-radius: 25px;
+            background: white;
+            color: #2c3e50;
+            outline: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            font-weight: bold;
+        }
+
+        .subcategory {
+            background-color: #ecf0f1;
+            font-weight: 500;
+        }
+
+        .total-row {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            font-weight: bold;
+        }
+
+        .profit-row {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 1px solid #ecf0f1;
+        }
+
+        .card h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 1.2em;
+        }
+
+        .card .amount {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .revenue { color: #27ae60; }
+        .expense { color: #e74c3c; }
+        .profit { color: #3498db; }
+
+        .export-btn {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 20px 10px;
+            transition: transform 0.2s;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Thống Kê Tài Chính Khởi Nghiệp</h1>
+            <p>Quản lý Thu nhập & Chi phí Dự án</p>
+        </div>
+
+        <div class="content">
+            <div class="period-selector">
+                <label for="period">Chọn kỳ báo cáo: </label>
+                <select id="period" onchange="updatePeriod()">
+                    <option value="month">Tháng hiện tại</option>
+                    <option value="quarter">Quý hiện tại</option>
+                    <option value="year">Năm hiện tại</option>
+                </select>
+            </div>
+
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>💰 Tổng Thu Nhập</h3>
+                    <div class="amount revenue" id="totalRevenue">0 VNĐ</div>
+                </div>
+                <div class="card">
+                    <h3>💸 Tổng Chi Phí</h3>
+                    <div class="amount expense" id="totalExpense">0 VNĐ</div>
+                </div>
+                <div class="card">
+                    <h3>📈 Lợi Nhuận</h3>
+                    <div class="amount profit" id="netProfit">0 VNĐ</div>
+                </div>
+            </div>
+
+            <table id="financialTable">
+                <thead>
+                    <tr>
+                        <th style="width: 40%">Khoản Mục</th>
+                        <th style="width: 20%">Giá Vốn (VNĐ)</th>
+                        <th style="width: 20%">Thu Nhập (VNĐ)</th>
+                        <th style="width: 20%">Chênh Lệch (VNĐ)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- THU NHẬP -->
+                    <tr class="category-header">
+                        <td colspan="4">💰 THU NHẬP</td>
+                    </tr>
+                    <tr>
+                        <td>Doanh thu bán hàng/dịch vụ</td>
+                        <td><input type="number" id="revenue_sales_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="revenue_sales_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="revenue_sales_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Thu nhập từ đầu tư</td>
+                        <td><input type="number" id="revenue_investment_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="revenue_investment_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="revenue_investment_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Thu nhập khác</td>
+                        <td><input type="number" id="revenue_other_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="revenue_other_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="revenue_other_diff">0</td>
+                    </tr>
+                    <tr class="subcategory">
+                        <td><strong>Tổng Thu Nhập</strong></td>
+                        <td id="total_revenue_planned">0</td>
+                        <td id="total_revenue_actual">0</td>
+                        <td id="total_revenue_diff">0</td>
+                    </tr>
+
+                    <!-- CHI PHÍ HOẠT ĐỘNG -->
+                    <tr class="category-header">
+                        <td colspan="4">🏢 CHI PHÍ HOẠT ĐỘNG</td>
+                    </tr>
+                    <tr>
+                        <td>Thuê văn phòng/mặt bằng</td>
+                        <td><input type="number" id="expense_rent_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_rent_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_rent_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Điện, nước, internet</td>
+                        <td><input type="number" id="expense_utilities_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_utilities_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_utilities_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Lương nhân viên</td>
+                        <td><input type="number" id="expense_salary_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_salary_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_salary_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Bảo hiểm xã hội</td>
+                        <td><input type="number" id="expense_insurance_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_insurance_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_insurance_diff">0</td>
+                    </tr>
+
+                    <!-- CHI PHÍ MARKETING -->
+                    <tr class="category-header">
+                        <td colspan="4">📢 CHI PHÍ MARKETING</td>
+                    </tr>
+                    <tr>
+                        <td>Quảng cáo online</td>
+                        <td><input type="number" id="expense_ads_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_ads_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_ads_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Thiết kế & in ấn</td>
+                        <td><input type="number" id="expense_design_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_design_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_design_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Sự kiện & hội thảo</td>
+                        <td><input type="number" id="expense_events_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_events_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_events_diff">0</td>
+                    </tr>
+
+                    <!-- CHI PHÍ KHÁC -->
+                    <tr class="category-header">
+                        <td colspan="4">📋 CHI PHÍ KHÁC</td>
+                    </tr>
+                    <tr>
+                        <td>Đào tạo & phát triển</td>
+                        <td><input type="number" id="expense_training_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_training_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_training_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Phí pháp lý & giấy phép</td>
+                        <td><input type="number" id="expense_legal_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_legal_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_legal_diff">0</td>
+                    </tr>
+                    <tr>
+                        <td>Chi phí vận hành khác</td>
+                        <td><input type="number" id="expense_misc_planned" onchange="calculate()" placeholder="0"></td>
+                        <td><input type="number" id="expense_misc_actual" onchange="calculate()" placeholder="0"></td>
+                        <td id="expense_misc_diff">0</td>
+                    </tr>
+
+                    <tr class="total-row">
+                        <td><strong>Tổng Chi Phí</strong></td>
+                        <td id="total_expense_planned">0</td>
+                        <td id="total_expense_actual">0</td>
+                        <td id="total_expense_diff">0</td>
+                    </tr>
+
+                    <tr class="profit-row">
+                        <td><strong>LỢI NHUẬN RÒNG</strong></td>
+                        <td id="net_profit_planned">0</td>
+                        <td id="net_profit_actual">0</td>
+                        <td id="net_profit_diff">0</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="export-btn" onclick="exportToCSV()">📊 Export CSV</button>
+                <button class="export-btn" onclick="printReport()">🖨️ In Báo Cáo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " VNĐ";
+        }
+
+        function calculate() {
+            // Thu nhập
+            const revenueSalesP = parseFloat(document.getElementById('revenue_sales_planned').value) || 0;
+            const revenueSalesA = parseFloat(document.getElementById('revenue_sales_actual').value) || 0;
+            const revenueInvestP = parseFloat(document.getElementById('revenue_investment_planned').value) || 0;
+            const revenueInvestA = parseFloat(document.getElementById('revenue_investment_actual').value) || 0;
+            const revenueOtherP = parseFloat(document.getElementById('revenue_other_planned').value) || 0;
+            const revenueOtherA = parseFloat(document.getElementById('revenue_other_actual').value) || 0;
+
+            // Chi phí
+            const expenseRentP = parseFloat(document.getElementById('expense_rent_planned').value) || 0;
+            const expenseRentA = parseFloat(document.getElementById('expense_rent_actual').value) || 0;
+            const expenseUtilitiesP = parseFloat(document.getElementById('expense_utilities_planned').value) || 0;
+            const expenseUtilitiesA = parseFloat(document.getElementById('expense_utilities_actual').value) || 0;
+            const expenseSalaryP = parseFloat(document.getElementById('expense_salary_planned').value) || 0;
+            const expenseSalaryA = parseFloat(document.getElementById('expense_salary_actual').value) || 0;
+            const expenseInsuranceP = parseFloat(document.getElementById('expense_insurance_planned').value) || 0;
+            const expenseInsuranceA = parseFloat(document.getElementById('expense_insurance_actual').value) || 0;
+            const expenseAdsP = parseFloat(document.getElementById('expense_ads_planned').value) || 0;
+            const expenseAdsA = parseFloat(document.getElementById('expense_ads_actual').value) || 0;
+            const expenseDesignP = parseFloat(document.getElementById('expense_design_planned').value) || 0;
+            const expenseDesignA = parseFloat(document.getElementById('expense_design_actual').value) || 0;
+            const expenseEventsP = parseFloat(document.getElementById('expense_events_planned').value) || 0;
+            const expenseEventsA = parseFloat(document.getElementById('expense_events_actual').value) || 0;
+            const expenseTrainingP = parseFloat(document.getElementById('expense_training_planned').value) || 0;
+            const expenseTrainingA = parseFloat(document.getElementById('expense_training_actual').value) || 0;
+            const expenseLegalP = parseFloat(document.getElementById('expense_legal_planned').value) || 0;
+            const expenseLegalA = parseFloat(document.getElementById('expense_legal_actual').value) || 0;
+            const expenseMiscP = parseFloat(document.getElementById('expense_misc_planned').value) || 0;
+            const expenseMiscA = parseFloat(document.getElementById('expense_misc_actual').value) || 0;
+
+            // Tính chênh lệch thu nhập
+            document.getElementById('revenue_sales_diff').textContent = formatNumber(revenueSalesA - revenueSalesP);
+            document.getElementById('revenue_investment_diff').textContent = formatNumber(revenueInvestA - revenueInvestP);
+            document.getElementById('revenue_other_diff').textContent = formatNumber(revenueOtherA - revenueOtherP);
+
+            // Tính chênh lệch chi phí
+            document.getElementById('expense_rent_diff').textContent = formatNumber(expenseRentA - expenseRentP);
+            document.getElementById('expense_utilities_diff').textContent = formatNumber(expenseUtilitiesA - expenseUtilitiesP);
+            document.getElementById('expense_salary_diff').textContent = formatNumber(expenseSalaryA - expenseSalaryP);
+            document.getElementById('expense_insurance_diff').textContent = formatNumber(expenseInsuranceA - expenseInsuranceP);
+            document.getElementById('expense_ads_diff').textContent = formatNumber(expenseAdsA - expenseAdsP);
+            document.getElementById('expense_design_diff').textContent = formatNumber(expenseDesignA - expenseDesignP);
+            document.getElementById('expense_events_diff').textContent = formatNumber(expenseEventsA - expenseEventsP);
+            document.getElementById('expense_training_diff').textContent = formatNumber(expenseTrainingA - expenseTrainingP);
+            document.getElementById('expense_legal_diff').textContent = formatNumber(expenseLegalA - expenseLegalP);
+            document.getElementById('expense_misc_diff').textContent = formatNumber(expenseMiscA - expenseMiscP);
+
+            // Tổng thu nhập
+            const totalRevenueP = revenueSalesP + revenueInvestP + revenueOtherP;
+            const totalRevenueA = revenueSalesA + revenueInvestA + revenueOtherA;
+            document.getElementById('total_revenue_planned').textContent = formatNumber(totalRevenueP);
+            document.getElementById('total_revenue_actual').textContent = formatNumber(totalRevenueA);
+            document.getElementById('total_revenue_diff').textContent = formatNumber(totalRevenueA - totalRevenueP);
+
+            // Tổng chi phí
+            const totalExpenseP = expenseRentP + expenseUtilitiesP + expenseSalaryP + expenseInsuranceP + 
+                                 expenseAdsP + expenseDesignP + expenseEventsP + expenseTrainingP + 
+                                 expenseLegalP + expenseMiscP;
+            const totalExpenseA = expenseRentA + expenseUtilitiesA + expenseSalaryA + expenseInsuranceA + 
+                                 expenseAdsA + expenseDesignA + expenseEventsA + expenseTrainingA + 
+                                 expenseLegalA + expenseMiscA;
+            document.getElementById('total_expense_planned').textContent = formatNumber(totalExpenseP);
+            document.getElementById('total_expense_actual').textContent = formatNumber(totalExpenseA);
+            document.getElementById('total_expense_diff').textContent = formatNumber(totalExpenseA - totalExpenseP);
+
+            // Lợi nhuận ròng (Thu nhập - Giá vốn)
+            const netProfitP = totalRevenueA - totalRevenueP; // Thu nhập - Giá vốn cho thu nhập
+            const netProfitA = totalRevenueA - totalExpenseA; // Thu nhập - Chi phí thực tế
+            document.getElementById('net_profit_planned').textContent = formatNumber(netProfitP);
+            document.getElementById('net_profit_actual').textContent = formatNumber(netProfitA);
+            document.getElementById('net_profit_diff').textContent = formatNumber(netProfitA - netProfitP);
+
+            // Cập nhật cards tổng quan
+            document.getElementById('totalRevenue').textContent = formatNumber(totalRevenueA);
+            document.getElementById('totalExpense').textContent = formatNumber(totalExpenseA);
+            document.getElementById('netProfit').textContent = formatNumber(netProfitA);
+        }
+
+        function updatePeriod() {
+            const period = document.getElementById('period').value;
+            // Có thể thêm logic để cập nhật dữ liệu theo kỳ
+            console.log('Đã chọn kỳ:', period);
+        }
+
+        function exportToCSV() {
+            const table = document.getElementById('financialTable');
+            let csv = [];
+            
+            for (let row of table.rows) {
+                let csvRow = [];
+                for (let cell of row.cells) {
+                    let text = cell.textContent || cell.querySelector('input')?.value || '';
+                    csvRow.push('"' + text.replace(/"/g, '""') + '"');
+                }
+                csv.push(csvRow.join(','));
+            }
+            
+            const csvContent = csv.join('\n');
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'thong_ke_tai_chinh_khoi_nghiep.csv';
+            link.click();
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        // Khởi tạo tính toán ban đầu
+        calculate();
+    </script>
+</body>
+</html>
